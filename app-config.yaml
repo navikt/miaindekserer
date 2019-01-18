@@ -48,3 +48,5 @@ fasitResources:
       propertyMap:
         url: pamUrl
 
+alertProfiles:
+ - basic
