@@ -1,5 +1,5 @@
 # vi: se sw=2 sts=2 ts=2 et:
-image: docker.adeo.no:5000/fo/miaindekserer
+image: navikt/miaindekserer
 replicas:
   min: 1
   max: 1
