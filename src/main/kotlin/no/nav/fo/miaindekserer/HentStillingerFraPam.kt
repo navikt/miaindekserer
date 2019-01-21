@@ -1,5 +1,6 @@
 package no.nav.fo.miaindekserer
 
+import no.nav.fo.miaindekserer.helpers.ingenKomune
 import no.nav.fo.miaindekserer.helpers.komuneNrTilFylkesNr
 import no.nav.fo.miaindekserer.helpers.styrkTilHovedkategori
 import no.nav.fo.miaindekserer.helpers.styrkTilUnderkategori
@@ -35,7 +36,11 @@ fun hentStillingerFraPam(side: Int, updatedSince: String, perSide: Int): List<St
             .map { categoryList -> categoryList["code"] as String }
             .map { s -> s.split(punctRegex).first() }.toList()
 
-        val komuneNumer = (it["location"] as JSONObject)["municipalCode"].toString()
+        val komuneNumer = (it["location"] as JSONObject?)
+            ?.get("municipalCode")
+            ?.toString()
+            ?: ingenKomune
+
         Stilling(
             id = it["uuid"] as String,
             active = it["status"] == "AKTIVE",

@@ -1,6 +1,10 @@
 package no.nav.fo.miaindekserer.helpers
 
+val ingenKomune = "ingen komune"
+val ingenFylke = "ingen fylke"
+
 val komuneNrTilFylkesNr = mapOf(
+    ingenKomune to ingenFylke,
     "5001" to "50",
     "5004" to "50",
     "5005" to "50",
