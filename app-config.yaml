@@ -34,8 +34,8 @@ fasitResources:
     - alias: mia_elasticsearch_user
       resourceType: credential
       propertyMap:
-        username: esUser
-        password: esPassword
+        username: ES_USER
+        password: ES_PASSWORD
 
     - alias: appdynamics
       resourceType: applicationproperties

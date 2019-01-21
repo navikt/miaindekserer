@@ -29,8 +29,8 @@ class HttpClientConfigCallback : RestClientBuilder.HttpClientConfigCallback {
     private fun createCredentialsProvider(): BasicCredentialsProvider {
         val credentialsProvider = BasicCredentialsProvider()
         val credentials = UsernamePasswordCredentials(
-            getProp("esUser"),
-            getProp("esPassword")
+            getProp("ES_USER"),
+            getProp("ES_PASSWORD")
         )
         credentialsProvider.setCredentials(AuthScope.ANY, credentials)
         return credentialsProvider
