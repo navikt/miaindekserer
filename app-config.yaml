@@ -46,7 +46,7 @@ fasitResources:
     - alias: pam-ad-internal-url
       resourceType: restservice
       propertyMap:
-        url: pamUrl
+        url: PAM_URL
 
 alertProfiles:
  - basic

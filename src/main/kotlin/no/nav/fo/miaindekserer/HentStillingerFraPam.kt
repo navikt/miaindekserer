@@ -8,7 +8,7 @@ import no.nav.fo.miaindekserer.helpers.styrkTilUnderkategori
 import org.json.JSONObject
 
 
-private val pamUrl = getProp("pamUrl")
+private val pamUrl = getProp("PAM_URL")
 private val punctRegex = """\.""".toRegex()
 
 
