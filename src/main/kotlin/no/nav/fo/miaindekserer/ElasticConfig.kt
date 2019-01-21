@@ -15,7 +15,7 @@ import org.elasticsearch.client.RestHighLevelClient
 fun elasticClient(): RestHighLevelClient =
         RestHighLevelClient(
             RestClient
-                .builder(HttpHost(getProp("esHost", "tpa-miasecsok-elasticsearch.tpa.svc.nais.local"),
+                .builder(HttpHost(esUri,
                     getProp("esPort", "9200").toInt(),
                     getProp("esScheam", "http")))
                 .setHttpClientConfigCallback(HttpClientConfigCallback())

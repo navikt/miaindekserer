@@ -8,14 +8,13 @@ import no.nav.fo.miaindekserer.helpers.styrkTilUnderkategori
 import org.json.JSONObject
 
 
-private val pamUrl = getProp("PAM_URL")
 private val punctRegex = """\.""".toRegex()
 
 
 
 fun hentStillingerFraPam(side: Int, updatedSince: String, perSide: Int): List<Stilling> {
     val response = khttp.get(
-        url = pamUrl,
+        url = "$pamUrl/api/v1/ads",
         params = mapOf(
             "updatedSince" to updatedSince,
             "sort" to "updated,asc",

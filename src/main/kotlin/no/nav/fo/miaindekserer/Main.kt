@@ -1,5 +1,6 @@
 package no.nav.fo.miaindekserer
 
+import no.nav.fo.miaindekserer.helpers.getProp
 import no.nav.fo.miaindekserer.helpers.jetty
 import no.nav.fo.miaindekserer.helpers.kjort
 import org.apache.logging.log4j.LogManager
@@ -17,12 +18,18 @@ import java.util.*
 val stillingsIndex = "stillinger"
 val oppdatert = "oppdatert"
 val doc = "_doc"
-val enTime = 60 * 60 * 1000L
 
+
+val pamUrl = getProp("PAM_URL", "http://pam-ad.default.svc.nais.local")
+val esUri = getProp("esHost", "tpa-miasecsok-elasticsearch.tpa.svc.nais.local")
 
 private val logger = LogManager.getLogger("main")!!
 
 fun main(args: Array<String>) {
+
+    logger.info("Starter")
+    logger.info("esUrl = $esUri")
+    logger.info("pamURL = $pamUrl")
 
     val esClient = elasticClient()
 
