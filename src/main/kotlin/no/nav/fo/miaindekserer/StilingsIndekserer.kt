@@ -42,6 +42,8 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
             .filter { it.public }
 
         if(stillinger.isEmpty()) {
+            logger.info("inngen stillinger i filtrert indekseringsliste")
+        } else {
             val response = esClient
                 .bulk(bulkUpsertRequest(stillinger), RequestOptions.DEFAULT)
 
@@ -49,8 +51,6 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
                 logger.warn("""indeksering har feil ${response.buildFailureMessage()}""")
             }
             logger.info("indekserte: ${response.items.filter { !it.isFailed }.size} velykket")
-        } else {
-            logger.info("inngen stillinger i filtrert indekseringsliste")
         }
 
         if (stillinger.first().gyldigTil == stillinger.last().gyldigTil) {
