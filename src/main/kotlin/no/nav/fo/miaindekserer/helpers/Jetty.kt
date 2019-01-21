@@ -57,9 +57,9 @@ class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
             pamRedy = true
         }
 
-        if(pamRedy && esReady) {
+        if (pamRedy && esReady) {
             resp.writer.println("Is Redy!")
-        }else {
+        } else {
             resp.status = 500
             resp.writer.println("pamredy er: $pamRedy")
             resp.writer.println("esredy er: $esReady")
@@ -71,17 +71,10 @@ class IsAlive(val sistIndeksertFraPam: kjort) : HttpServlet() {
     val logger = LogManager.getLogger(this.javaClass.name)
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
-        val pamHealty = sistIndeksertFraPam.healty(50.0)
 
-        if(pamHealty) {
-            resp.writer.println("Healty")
-            resp.writer.println("pam sist kjort ${sistIndeksertFraPam.sistKjort}")
-        } else {
-            logger.error("for lenge siden indekseringsjobben har skjørt, sist kjort ${sistIndeksertFraPam.sistKjort}")
+        resp.writer.println("Healty")
+        resp.writer.println("pam sist kjort ${sistIndeksertFraPam.sistKjort}")
+        logger.trace("pam sist kjort ${sistIndeksertFraPam.sistKjort}")
 
-            resp.status = 500
-            resp.writer.println("IKKE FRISK")
-            resp.writer.println("pam sist kjort ${sistIndeksertFraPam.sistKjort}")
-        }
     }
 }
