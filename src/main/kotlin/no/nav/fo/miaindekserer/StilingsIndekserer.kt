@@ -20,7 +20,7 @@ val startPam = "2018-01-01T10:00"
 
 private val gson = Gson()
 
-private val antall = 1000
+private val antall = 100
 
 private val logger = LogManager.getLogger("pamIndekser")!!
 

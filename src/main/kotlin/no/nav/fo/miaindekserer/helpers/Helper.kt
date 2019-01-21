@@ -29,7 +29,6 @@ operator fun Date.compareTo(now: Long): Int = this.time.compareTo(now)
 operator fun Long.compareTo(date: Date): Int = this.compareTo(date.time)
 
 
-
 fun addShutdownHook() {
     Runtime.getRuntime().addShutdownHook(object : Thread() {
         override fun run() {
@@ -37,6 +36,3 @@ fun addShutdownHook() {
         }
     })
 }
-
-
-
