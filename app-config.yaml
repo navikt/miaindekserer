@@ -43,10 +43,5 @@ fasitResources:
     - alias: unleash-api
       resourceType: restservice
 
-    - alias: pam-ad-internal-url
-      resourceType: restservice
-      propertyMap:
-        url: PAM_URL
-
 alertProfiles:
  - basic
