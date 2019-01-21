@@ -24,6 +24,19 @@ private val antall = 1000
 
 private val logger = LogManager.getLogger("pamIndekser")!!
 
+data class Stilling(
+    val id: String,
+    val active: Boolean,
+    val public: Boolean,
+    val antall: Int,
+    val styrk: List<String>,
+    val hovedkategori: List<String>,
+    val underkattegori: List<String>,
+    val komuneNumer: String?,
+    val fylkesnr: String?,
+    val gyldigTil: String,
+    val oppdatert: String
+)
 
 fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
     slettGamleStillinger(esClient)

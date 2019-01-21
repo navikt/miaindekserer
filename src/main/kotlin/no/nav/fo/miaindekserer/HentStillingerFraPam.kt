@@ -48,7 +48,7 @@ fun hentStillingerFraPamMedPrivate(side: Int, updatedSince: String, perSide: Int
 
             Stilling(
                     id = it.uuid,
-                    active = it.status == "AKTIVE",
+                    active = it.status == "ACTIVE",
                     public = it.privacy == "SHOW_ALL",
                     antall = it.properties?.positioncount?.toIntOrNull()?: 1,
                     styrk = styrk,

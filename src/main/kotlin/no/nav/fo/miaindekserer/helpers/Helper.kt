@@ -30,7 +30,13 @@ operator fun Long.compareTo(date: Date): Int = this.compareTo(date.time)
 
 
 
-
+fun addShutdownHook() {
+    Runtime.getRuntime().addShutdownHook(object : Thread() {
+        override fun run() {
+            sleep(5000)
+        }
+    })
+}
 
 
 
