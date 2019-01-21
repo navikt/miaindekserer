@@ -27,13 +27,11 @@ val esUri = getProp("ES_HOST", "tpa-miasecsok-elasticsearch.tpa.svc.nais.local")
 private val logger = LogManager.getLogger("main")!!
 
 fun main(args: Array<String>) {
-
-    addShutdownHook()
-
-
     logger.info("Starter")
     logger.info("esUrl = $esUri")
     logger.info("pamURL = $pamUrl")
+
+    addShutdownHook()
 
     val esClient = elasticClient()
 
