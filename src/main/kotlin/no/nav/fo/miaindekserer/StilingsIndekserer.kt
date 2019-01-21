@@ -41,14 +41,17 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
         val stillinger = stillingerMedPrivate
             .filter { it.public }
 
-        val response = esClient
-            .bulk(bulkUpsertRequest(stillinger), RequestOptions.DEFAULT)
+        if(stillinger.isEmpty()) {
+            val response = esClient
+                .bulk(bulkUpsertRequest(stillinger), RequestOptions.DEFAULT)
 
-        if (response.hasFailures()) {
-            logger.warn("""indeksering har feil ${response.buildFailureMessage()}""")
+            if (response.hasFailures()) {
+                logger.warn("""indeksering har feil ${response.buildFailureMessage()}""")
+            }
+            logger.info("indekserte: ${response.items.filter { !it.isFailed }.size} velykket")
+        } else {
+            logger.info("inngen stillinger i filtrert indekseringsliste")
         }
-        logger.info("indekserte: ${response.items.filter { !it.isFailed }.size} velykket")
-
 
         if (stillinger.first().gyldigTil == stillinger.last().gyldigTil) {
             side++
