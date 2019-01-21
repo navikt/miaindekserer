@@ -1,7 +1,5 @@
 package no.nav.fo.miaindekserer
 
-
-import no.nav.fo.miaindekserer.helpers.getProp
 import no.nav.fo.miaindekserer.helpers.komuneNrTilFylkesNr
 import no.nav.fo.miaindekserer.helpers.styrkTilHovedkategori
 import no.nav.fo.miaindekserer.helpers.styrkTilUnderkategori
@@ -9,7 +7,6 @@ import org.json.JSONObject
 
 
 private val punctRegex = """\.""".toRegex()
-
 
 
 fun hentStillingerFraPam(side: Int, updatedSince: String, perSide: Int): List<Stilling> {

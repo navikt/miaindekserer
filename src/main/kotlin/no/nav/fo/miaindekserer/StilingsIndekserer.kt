@@ -41,10 +41,10 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
         val response = esClient
             .bulk(bulkUpsertRequest(stillinger), RequestOptions.DEFAULT)
 
-        if(response.hasFailures()) {
+        if (response.hasFailures()) {
             logger.warn("""indeksering har feil ${response.buildFailureMessage()}""")
         }
-        logger.info("indekserte: ${response.items.filter { !it.isFailed }.size } velykket")
+        logger.info("indekserte: ${response.items.filter { !it.isFailed }.size} velykket")
 
 
         if (stillinger.first().gyldigTil == stillinger.last().gyldigTil) {

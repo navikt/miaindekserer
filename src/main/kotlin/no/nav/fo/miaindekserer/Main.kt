@@ -48,8 +48,7 @@ fun main(args: Array<String>) {
             logger.info("starter indeksering")
             indekserStillingerFraPam(esClient)
             logger.info("inmdeksering ferdig")
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             logger.error("indeksering feilet", e)
             System.exit(1)
         }
@@ -61,12 +60,13 @@ fun main(args: Array<String>) {
 }
 
 private fun RestHighLevelClient.finnesIndex(index: String) = this
-        .indices()
-        .exists(GetIndexRequest().indices(index), RequestOptions.DEFAULT)
+    .indices()
+    .exists(GetIndexRequest().indices(index), RequestOptions.DEFAULT)
 
 private fun RestHighLevelClient.oppretStillingerIndex() {
     val create = CreateIndexRequest(stillingsIndex)
-    create.mapping("_doc",
+    create.mapping(
+        "_doc",
         """{
             "_doc": {
               "properties": {
@@ -91,7 +91,7 @@ private fun RestHighLevelClient.oppretStillingerIndex() {
 }
 
 
-data class Stilling (
+data class Stilling(
     val id: String,
     val active: Boolean,
     val public: Boolean,
