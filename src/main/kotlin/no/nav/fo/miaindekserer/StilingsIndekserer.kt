@@ -38,7 +38,8 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
             perSide = antall
         )
 
-        val stillinger = stillingerMedPrivate.filter { it.public }
+        val stillinger = stillingerMedPrivate
+            .filter { it.public }
 
         val response = esClient
             .bulk(bulkUpsertRequest(stillinger), RequestOptions.DEFAULT)
