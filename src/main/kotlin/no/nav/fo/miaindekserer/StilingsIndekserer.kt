@@ -77,7 +77,7 @@ fun slettGamleStillinger(esClient: RestHighLevelClient) {
                     )
                     .should(
                         QueryBuilders.boolQuery()
-                            .must(QueryBuilders.matchQuery("active", true))
+                            .must(QueryBuilders.matchQuery("active", false))
                             .must(QueryBuilders.rangeQuery(oppdatert).lt(hentNyesteOppdatert(esClient)))
                     )
                     .minimumShouldMatch(1)
