@@ -32,11 +32,13 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
     var updatedSince = hentNyesteOppdatert(esClient)
 
     do {
-        val stillinger = hentStillingerFraPam(
+        val stillingerMedPrivate = hentStillingerFraPamMedPrivate(
             side = side,
             updatedSince = updatedSince,
             perSide = antall
         )
+
+        val stillinger = stillingerMedPrivate.filter { it.public }
 
         val response = esClient
             .bulk(bulkUpsertRequest(stillinger), RequestOptions.DEFAULT)
@@ -54,7 +56,7 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
             side = 0
         }
 
-    } while (stillinger.size == antall)
+    } while (stillingerMedPrivate.size == antall)
 }
 
 private fun bulkUpsertRequest(stillinger: List<Stilling>) = BulkRequest()

@@ -3,7 +3,7 @@ package no.nav.fo.miaindekserer.helpers
 import io.prometheus.client.exporter.MetricsServlet
 import io.prometheus.client.hotspot.DefaultExports
 import no.nav.fo.miaindekserer.hentNyesteOppdatert
-import no.nav.fo.miaindekserer.hentStillingerFraPam
+import no.nav.fo.miaindekserer.hentStillingerFraPamMedPrivate
 import no.nav.fo.miaindekserer.startPam
 import org.apache.logging.log4j.LogManager
 import org.eclipse.jetty.server.Server
@@ -26,7 +26,7 @@ fun jetty(
     server.handler = context
 
     context.addServlet(ServletHolder(IsAlive(sistOppdatertPam)), "/isAlive")
-    context.addServlet(ServletHolder(IsRedy(esClient)), "/isRedy")
+    context.addServlet(ServletHolder(IsRedy(esClient)), "/isReady")
     context.addServlet(ServletHolder(MetricsServlet()), "/metrics")
     DefaultExports.initialize()
 
@@ -53,7 +53,7 @@ class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
         }
 
         if (!pamRedy) {
-            hentStillingerFraPam(side = 0, updatedSince = startPam, perSide = 10)
+            hentStillingerFraPamMedPrivate(side = 0, updatedSince = startPam, perSide = 10)
             pamRedy = true
         }
 

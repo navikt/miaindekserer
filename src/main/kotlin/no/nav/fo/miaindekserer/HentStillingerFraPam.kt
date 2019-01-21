@@ -25,7 +25,7 @@ data class Category(val code: String?)
 data class Properties(val positioncount: String?)
 data class Location(val municipalCode: String?)
 
-fun hentStillingerFraPam(side: Int, updatedSince: String, perSide: Int): List<Stilling> {
+fun hentStillingerFraPamMedPrivate(side: Int, updatedSince: String, perSide: Int): List<Stilling> {
     val response = khttp.get(
         url = "$pamUrl/api/v1/ads",
         params = mapOf(
@@ -41,8 +41,8 @@ fun hentStillingerFraPam(side: Int, updatedSince: String, perSide: Int): List<St
         .content
         .map {
             val styrk = it.categoryList
-                ?.mapNotNull { it?.code }
-                ?.mapNotNull { s -> s.split(punctRegex).first() } ?: emptyList()
+                ?.mapNotNull {category ->  category?.code }
+                ?.map { s -> s.split(punctRegex).first() } ?: emptyList()
 
             val komuineNr = it.location?.municipalCode?: ingenKomune
 
@@ -59,6 +59,6 @@ fun hentStillingerFraPam(side: Int, updatedSince: String, perSide: Int): List<St
                     gyldigTil = it.expires,
                     oppdatert = it.updated
                 )
-        }.filter { it.public }
+        }
 }
 
