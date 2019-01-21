@@ -32,36 +32,38 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
     var updatedSince = hentNyesteOppdatert(esClient)
 
     do {
-        val stillingerMedPrivate = hentStillingerFraPamMedPrivate(
+        val stillinger = hentStillingerFraPamMedPrivate(
             side = side,
             updatedSince = updatedSince,
             perSide = antall
         )
 
-        val stillinger = stillingerMedPrivate
-            .filter { it.public }
-
-        if(stillinger.isEmpty()) {
-            logger.info("inngen stillinger i filtrert indekseringsliste")
-        } else {
-            val response = esClient
-                .bulk(bulkUpsertRequest(stillinger), RequestOptions.DEFAULT)
-
-            if (response.hasFailures()) {
-                logger.warn("""indeksering har feil ${response.buildFailureMessage()}""")
-            }
-            logger.info("indekserte: ${response.items.filter { !it.isFailed }.size} velykket")
-        }
+        esClient.indekser( stillinger )
 
         if (stillinger.first().gyldigTil == stillinger.last().gyldigTil) {
             side++
         } else {
-            updatedSince = stillinger.last().gyldigTil
             side = 0
+            updatedSince = stillinger.last().oppdatert
         }
 
-    } while (stillingerMedPrivate.size == antall)
+    } while (stillinger.size == antall)
 }
+
+private fun RestHighLevelClient.indekser(stillinger: List<Stilling>) {
+    if (stillinger.isEmpty()) {
+        logger.info("inngen stillinger i filtrert indekseringsliste")
+    } else {
+        val response = this
+            .bulk(bulkUpsertRequest(stillinger), RequestOptions.DEFAULT)
+
+        if (response.hasFailures()) {
+            logger.warn("""indeksering har feil ${response.buildFailureMessage()}""")
+        }
+        logger.info("indekserte: ${response.items.filter { !it.isFailed }.size} velykket")
+    }
+}
+
 
 private fun bulkUpsertRequest(stillinger: List<Stilling>) = BulkRequest()
     .add(
