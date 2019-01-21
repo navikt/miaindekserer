@@ -19,7 +19,7 @@ fun jetty(
     sistOppdatertPam: kjort,
     esClient: RestHighLevelClient
 ) {
-    val server = Server(1234)
+    val server = Server(8080)
 
     val context = ServletContextHandler()
     context.contextPath = "/"
