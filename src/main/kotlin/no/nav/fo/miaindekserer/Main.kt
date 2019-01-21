@@ -37,7 +37,7 @@ fun main(args: Array<String>) {
         esClient.oppretStillingerIndex()
     }
 
-    val sistOppdatertPam = kjort(Date(0), 5000)
+    val sistOppdatertPam = kjort(Date(0), 50000)
     fixedRateTimer(
         name = "pamStillingOppdaterer",
         initialDelay = 100,
@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
         try {
             logger.info("starter indeksering")
             indekserStillingerFraPam(esClient)
-            logger.info("inmdeksering ferdig")
+            logger.info("indeksering ferdig")
         } catch (e: Exception) {
             logger.error("indeksering feilet", e)
             System.exit(1)
