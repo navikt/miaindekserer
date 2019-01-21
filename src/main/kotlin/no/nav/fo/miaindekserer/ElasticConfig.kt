@@ -17,8 +17,8 @@ fun elasticClient(): RestHighLevelClient =
             .builder(
                 HttpHost(
                     esUri,
-                    getProp("esPort", "9200").toInt(),
-                    getProp("esScheam", "http")
+                    getProp("ES_PORT", "9200").toInt(),
+                    getProp("ES_SCHEAM", "http")
                 )
             )
             .setHttpClientConfigCallback(HttpClientConfigCallback())

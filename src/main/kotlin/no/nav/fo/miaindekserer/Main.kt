@@ -21,7 +21,7 @@ val doc = "_doc"
 
 
 val pamUrl = getProp("PAM_URL", "http://pam-ad.default.svc.nais.local")
-val esUri = getProp("esHost", "tpa-miasecsok-elasticsearch.tpa.svc.nais.local")
+val esUri = getProp("ES_HOST", "tpa-miasecsok-elasticsearch.tpa.svc.nais.local")
 
 private val logger = LogManager.getLogger("main")!!
 
@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
     fixedRateTimer(
         name = "pamStillingOppdaterer",
         initialDelay = 100,
-        period = 5000
+        period = 50000
     )
     {
         try {
