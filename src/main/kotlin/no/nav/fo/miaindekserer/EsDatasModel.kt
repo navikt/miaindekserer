@@ -1,6 +1,6 @@
 package no.nav.fo.miaindekserer
 
-val stillingsIndex = "stillinger2"
+val stillingsIndex = "stillinger3"
 val oppdatert = "oppdatert"
 val doc = "_doc"
 
