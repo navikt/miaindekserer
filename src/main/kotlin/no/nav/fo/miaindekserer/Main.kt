@@ -1,30 +1,12 @@
 package no.nav.fo.miaindekserer
 
-import no.nav.fo.miaindekserer.helpers.addShutdownHook
-import no.nav.fo.miaindekserer.helpers.getProp
-import no.nav.fo.miaindekserer.helpers.jetty
-import no.nav.fo.miaindekserer.helpers.kjort
+import no.nav.fo.miaindekserer.helpers.*
 import org.apache.logging.log4j.LogManager
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest
-import org.elasticsearch.client.RequestOptions
-import org.elasticsearch.client.RestHighLevelClient
-import org.elasticsearch.common.xcontent.XContentType
-
 
 import kotlin.concurrent.fixedRateTimer
 import java.util.*
 
-
-val stillingsIndex = "stillinger"
-val oppdatert = "oppdatert"
-val doc = "_doc"
-
-
-val pamUrl = getProp("PAM_URL", "http://pam-ad.default.svc.nais.local")
-val esUri = getProp("ES_HOST", "tpa-miasecsok-elasticsearch.tpa.svc.nais.local")
-
-private val logger = LogManager.getLogger("main")!!
+private val logger = LogManager.getLogger()
 
 fun main(args: Array<String>) {
     logger.info("Starter")
@@ -35,8 +17,9 @@ fun main(args: Array<String>) {
 
     val esClient = elasticClient()
 
+
     if (!esClient.finnesIndex(stillingsIndex)) {
-        esClient.oppretStillingerIndex()
+        esClient.createIndice(stillingsIndex, stillingerMapping)
     }
 
     val sistOppdatertPam = kjort(Date(0), 50000)
@@ -57,5 +40,5 @@ fun main(args: Array<String>) {
         sistOppdatertPam.sistKjort = Date()
     }
 
-    jetty(sistOppdatertPam, esClient)
+    jetty(esClient = esClient, sistOppdatertPam = sistOppdatertPam)
 }

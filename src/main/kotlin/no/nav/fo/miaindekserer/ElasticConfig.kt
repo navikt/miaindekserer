@@ -14,6 +14,8 @@ import org.elasticsearch.client.RestClientBuilder
 import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.common.xcontent.XContentType
 
+val esUri = getProp("ES_HOST", "tpa-miasecsok-elasticsearch.tpa.svc.nais.local")
+
 fun elasticClient(): RestHighLevelClient =
     RestHighLevelClient(
         RestClient
@@ -45,24 +47,8 @@ class HttpClientConfigCallback : RestClientBuilder.HttpClientConfigCallback {
 fun RestHighLevelClient.oppretStillingerIndex() {
     val create = CreateIndexRequest(stillingsIndex)
     create.mapping(
-        "_doc",
-        """{
-            "_doc": {
-              "properties": {
-                "id": { "type": "text" },
-                "active": { "type": "boolean" },
-                "public": { "type": "boolean" },
-                "antall": { "type": "short" },
-                "styrk": { "type": "keyword" },
-                "hovedkategori": { "type": "keyword" },
-                "underkattegori": { "type": "keyword" },
-                "komuneNumer": { "type": "keyword" },
-                "fylkesnr": { "type": "keyword" },
-                "gyldigTil": { "type": "date" },
-                "oppdatert": { "type": "date" }
-              }
-            }
-            }""".trimIndent(), XContentType.JSON
+        doc,
+        stillingerMapping, XContentType.JSON
     )
 
     val result = this.indices().create(create, RequestOptions.DEFAULT)

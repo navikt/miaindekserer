@@ -20,6 +20,7 @@
         <jetty.version>9.4.14.v20181114</jetty.version>
         <gson.version>2.8.5</gson.version>
         <promethus.version>0.6.0</promethus.version>
+        <csv.version>1.6</csv.version>
     </properties>
 
     <repositories>
@@ -31,6 +32,11 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${csv.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

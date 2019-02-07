@@ -17,11 +17,9 @@ healthcheck:
 
 resources:
   limits:
-    cpu: 6
-    memory: 768Mi
-  requests:
     memory: 512Mi
-
+  requests:
+    memory: 256Mi
 
 prometheus:
   enabled: true

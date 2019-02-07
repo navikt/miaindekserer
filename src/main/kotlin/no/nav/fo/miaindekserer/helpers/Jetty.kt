@@ -1,5 +1,6 @@
 package no.nav.fo.miaindekserer.helpers
 
+import indekserStattestikk
 import io.prometheus.client.exporter.MetricsServlet
 import io.prometheus.client.hotspot.DefaultExports
 import no.nav.fo.miaindekserer.hentNyesteOppdatert
@@ -11,12 +12,13 @@ import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
 import org.elasticsearch.client.RestHighLevelClient
 import java.util.*
+import javax.servlet.MultipartConfigElement
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 fun jetty(
-    sistOppdatertPam: kjort,
+    sistOppdatertPam: kjort?,
     esClient: RestHighLevelClient
 ) {
     val server = Server(8080)
@@ -25,13 +27,32 @@ fun jetty(
     context.contextPath = "/"
     server.handler = context
 
-    context.addServlet(ServletHolder(IsAlive(sistOppdatertPam)), "/isAlive")
+    val a = ServletHolder(UploadeService(esClient))
+
+    a.registration.setMultipartConfig(MultipartConfigElement("", 52428800, 52428800, 52428800))
+
+    //context.addServlet(ServletHolder(IsAlive(sistOppdatertPam)), "/isAlive")
     context.addServlet(ServletHolder(IsRedy(esClient)), "/isReady")
     context.addServlet(ServletHolder(MetricsServlet()), "/metrics")
+    context.addServlet(a, "/uploade")
     DefaultExports.initialize()
 
     server.start()
     server.join()
+}
+
+class UploadeService(esClient: RestHighLevelClient) : HttpServlet() {
+    val esClient = esClient
+
+    override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        val alias = req.queryString.split("=")[1]
+        val part = req.getPart("file")
+        indekserStattestikk(stream = part.inputStream, esClient = esClient, alias = alias)
+
+        resp.status = 200
+        resp.writer.println("$alias suksefult oppdatert")
+    }
+
 }
 
 data class kjort(var sistKjort: Date, val period: Long) {
@@ -64,17 +85,20 @@ class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
             resp.writer.println("pamredy er: $pamRedy")
             resp.writer.println("esredy er: $esReady")
         }
+        super.doGet(req, resp)
     }
 }
 
 class IsAlive(val sistIndeksertFraPam: kjort) : HttpServlet() {
-    val logger = LogManager.getLogger(this.javaClass.name)
+    val logger = LogManager.getLogger()
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 
         resp.writer.println("Healty")
         resp.writer.println("pam sist kjort ${sistIndeksertFraPam.sistKjort}")
         logger.trace("pam sist kjort ${sistIndeksertFraPam.sistKjort}")
+        super.doGet(req, resp)
+
 
     }
 }

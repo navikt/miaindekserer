@@ -24,23 +24,7 @@ private val antall = 100
 
 private val logger = LogManager.getLogger("pamIndekser")!!
 
-data class Stilling(
-    val id: String,
-    val active: Boolean,
-    val public: Boolean,
-    val antall: Int,
-    val styrk: List<String>,
-    val hovedkategori: List<String>,
-    val underkattegori: List<String>,
-    val komuneNumer: String?,
-    val fylkesnr: String?,
-    val gyldigTil: String,
-    val oppdatert: String
-)
-
 fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
-    slettGamleStillinger(esClient)
-
     var side = 0
     var updatedSince = hentNyesteOppdatert(esClient)
 
@@ -51,7 +35,7 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
             perSide = antall
         )
 
-        esClient.indekser( stillinger )
+        esClient.indekser(stillinger)
 
         if (stillinger.first().gyldigTil == stillinger.last().gyldigTil) {
             side++
@@ -61,9 +45,11 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
         }
 
     } while (stillinger.size == antall)
+
+    slettGamleStillinger(esClient)
 }
 
-private fun RestHighLevelClient.indekser(stillinger: List<Stilling>) {
+fun RestHighLevelClient.indekser(stillinger: List<Stilling>) {
     if (stillinger.isEmpty()) {
         logger.info("inngen stillinger i filtrert indekseringsliste")
     } else {

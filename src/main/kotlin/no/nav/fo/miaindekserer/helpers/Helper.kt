@@ -1,5 +1,6 @@
 package no.nav.fo.miaindekserer.helpers
 
+import org.apache.logging.log4j.LogManager
 import java.util.*
 
 
@@ -32,7 +33,10 @@ operator fun Long.compareTo(date: Date): Int = this.compareTo(date.time)
 fun addShutdownHook() {
     Runtime.getRuntime().addShutdownHook(object : Thread() {
         override fun run() {
+            val logger = LogManager.getLogger()
+            logger.info("venter 5 sec med Shutdown")
             sleep(5000)
+            logger.info("natta")
         }
     })
 }
