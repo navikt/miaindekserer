@@ -21,7 +21,7 @@ fun jetty(
     sistOppdatertPam: kjort,
     esClient: RestHighLevelClient
 ) {
-    val server = Server(1234)
+    val server = Server(8080)
 
     val context = ServletContextHandler()
     context.contextPath = "/"
@@ -110,7 +110,6 @@ class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
             resp.writer.println("pamredy er: $pamRedy")
             resp.writer.println("esredy er: $esReady")
         }
-        super.doGet(req, resp)
     }
 }
 
@@ -132,6 +131,5 @@ class IsAlive(val sistIndeksertFraPam: kjort) : HttpServlet() {
             resp.writer.println("Not healty")
             resp.writer.println(sistIndeksertFraPam.status())
         }
-        super.doGet(req, resp)
     }
 }
