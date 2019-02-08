@@ -42,8 +42,11 @@ fun jetty(
 }
 
 class UploadeService(val esClient: RestHighLevelClient) : HttpServlet() {
+    val logger = LogManager.getLogger()
+
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         val alias = req.queryString.split("=")[1]
+        logger.info("uploding file to alias $alias")
         val part = req.getPart("file")
         indekserStattestikk(stream = part.inputStream, esClient = esClient, alias = alias)
 
@@ -65,7 +68,7 @@ data class kjort(val period: Long, val initialDilay: Long, val name: String) {
         return if(sistKjort == null) {
             created.time  > Date().time - (period * multiplier) - initialDilay - 1000
         } else {
-            (sistKjort as Date).time > Date().time - (period * multiplier)
+            (sistKjort as Date).time > Date().time - (period * multiplier) - 1000
         }
     }
 
@@ -79,6 +82,7 @@ data class kjort(val period: Long, val initialDilay: Long, val name: String) {
 }
 
 class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
+    val logger = LogManager.getLogger()
     val client = esClient
 
     var esReady = false
@@ -97,8 +101,11 @@ class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
         }
 
         if (pamRedy && esReady) {
+            resp.status = 200
             resp.writer.println("Is Redy!")
+            logger.info("Is Ready")
         } else {
+            logger.warn("ikke ready pam: $pamRedy, es: $esReady")
             resp.status = 500
             resp.writer.println("pamredy er: $pamRedy")
             resp.writer.println("esredy er: $esReady")
@@ -115,6 +122,7 @@ class IsAlive(val sistIndeksertFraPam: kjort) : HttpServlet() {
         if(sistIndeksertFraPam.healty()) {
             logger.info("healty :) " + sistIndeksertFraPam.status())
 
+            resp.status = 200
             resp.writer.println("Healty")
             resp.writer.println(sistIndeksertFraPam.status())
             super.doGet(req, resp)

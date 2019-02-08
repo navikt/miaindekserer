@@ -5,6 +5,7 @@ import no.nav.fo.miaindekserer.statestikkMapping
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
+import org.apache.logging.log4j.LogManager
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
 import org.elasticsearch.client.RequestOptions
@@ -19,6 +20,7 @@ private val csvFormat = CSVFormat
     .withIgnoreHeaderCase()
     .withTrim()
 
+private val logger = LogManager.getLogger()
 
 fun indekserStattestikk(stream: InputStream, esClient: RestHighLevelClient, alias: String): Boolean {
     val bufferedReader = stream.bufferedReader()
@@ -48,7 +50,15 @@ fun indekserStattestikk(stream: InputStream, esClient: RestHighLevelClient, alia
 
     esClient.replaceIndexForAlias(alias, index)
 
-    return failurs.contains(true)
+    val sucsess =  !failurs.contains(true)
+
+    if(sucsess) {
+        logger.info("indeksering vewlykket av $alias")
+    }else {
+        logger.error("indeksering feiler av $alias")
+    }
+
+    return sucsess
 }
 
 private fun RestHighLevelClient.replaceIndexForAlias(alias: String, nyIndex: String) {
