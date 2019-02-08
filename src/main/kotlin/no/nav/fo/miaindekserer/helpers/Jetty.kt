@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 fun jetty(
-    sistOppdatertPam: kjort?,
+    sistOppdatertPam: kjort,
     esClient: RestHighLevelClient
 ) {
     val server = Server(8080)
@@ -31,7 +31,7 @@ fun jetty(
 
     a.registration.setMultipartConfig(MultipartConfigElement("", 52428800, 52428800, 52428800))
 
-    //context.addServlet(ServletHolder(IsAlive(sistOppdatertPam)), "/isAlive")
+    context.addServlet(ServletHolder(IsAlive(sistOppdatertPam)), "/isAlive")
     context.addServlet(ServletHolder(IsRedy(esClient)), "/isReady")
     context.addServlet(ServletHolder(MetricsServlet()), "/metrics")
     context.addServlet(a, "/uploade")
@@ -41,9 +41,7 @@ fun jetty(
     server.join()
 }
 
-class UploadeService(esClient: RestHighLevelClient) : HttpServlet() {
-    val esClient = esClient
-
+class UploadeService(val esClient: RestHighLevelClient) : HttpServlet() {
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         val alias = req.queryString.split("=")[1]
         val part = req.getPart("file")
@@ -55,9 +53,29 @@ class UploadeService(esClient: RestHighLevelClient) : HttpServlet() {
 
 }
 
-data class kjort(var sistKjort: Date, val period: Long) {
-    fun healty(multiplier: Double = 3.0) =
-        Date().time - period * multiplier < sistKjort.time
+data class kjort(val period: Long, val initialDilay: Long, val name: String) {
+    private val created = Date()
+    private var sistKjort: Date? = null
+
+    fun kjort() {
+        sistKjort = Date()
+    }
+
+    fun healty(multiplier: Double = 3.0): Boolean {
+        return if(sistKjort == null) {
+            created.time  > Date().time - (period * multiplier) - initialDilay - 1000
+        } else {
+            (sistKjort as Date).time > Date().time - (period * multiplier)
+        }
+    }
+
+    fun status(): String {
+        return if(sistKjort == null) {
+            "$name ikke kjørt enda, created: $created"
+        } else {
+            "$name sist skjort: $sistKjort created: $created"
+        }
+    }
 }
 
 class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
@@ -94,11 +112,19 @@ class IsAlive(val sistIndeksertFraPam: kjort) : HttpServlet() {
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 
-        resp.writer.println("Healty")
-        resp.writer.println("pam sist kjort ${sistIndeksertFraPam.sistKjort}")
-        logger.trace("pam sist kjort ${sistIndeksertFraPam.sistKjort}")
-        super.doGet(req, resp)
+        if(sistIndeksertFraPam.healty()) {
+            logger.info("healty :) " + sistIndeksertFraPam.status())
 
+            resp.writer.println("Healty")
+            resp.writer.println(sistIndeksertFraPam.status())
+            super.doGet(req, resp)
+        } else {
+            logger.warn("not healty " + sistIndeksertFraPam.status())
 
+            resp.status = 500
+            resp.writer.println("Not healty")
+            resp.writer.println(sistIndeksertFraPam.status())
+            super.doGet(req, resp)
+        }
     }
 }

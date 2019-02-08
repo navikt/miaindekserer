@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
         esClient.createIndice(stillingsIndex, stillingerMapping)
     }
 
-    val sistOppdatertPam = kjort(Date(0), 50000)
+    val sistOppdatertPam = kjort(50000, 10, "pam indekserer")
     fixedRateTimer(
         name = "pamStillingOppdaterer",
         initialDelay = 100,
@@ -31,13 +31,12 @@ fun main(args: Array<String>) {
     {
         try {
             logger.info("starter indeksering")
-            indekserStillingerFraPam(esClient)
+            indekserStillingerFraPam(esClient, sistOppdatertPam)
             logger.info("indeksering ferdig")
         } catch (e: Exception) {
             logger.error("indeksering feilet", e)
             System.exit(1)
         }
-        sistOppdatertPam.sistKjort = Date()
     }
 
     jetty(esClient = esClient, sistOppdatertPam = sistOppdatertPam)

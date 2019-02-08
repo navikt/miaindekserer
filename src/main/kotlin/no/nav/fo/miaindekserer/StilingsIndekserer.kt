@@ -1,6 +1,7 @@
 package no.nav.fo.miaindekserer
 
 import com.google.gson.Gson
+import no.nav.fo.miaindekserer.helpers.kjort
 import no.nav.fo.miaindekserer.helpers.midenattIGard
 import org.apache.logging.log4j.LogManager
 import org.elasticsearch.action.bulk.BulkRequest
@@ -14,6 +15,7 @@ import org.elasticsearch.index.reindex.DeleteByQueryRequest
 import org.elasticsearch.search.aggregations.AggregationBuilders
 import org.elasticsearch.search.aggregations.metrics.max.Max
 import org.elasticsearch.search.builder.SearchSourceBuilder
+import java.util.*
 
 
 val startPam = "2018-01-01T10:00"
@@ -24,7 +26,10 @@ private val antall = 100
 
 private val logger = LogManager.getLogger("pamIndekser")!!
 
-fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
+fun indekserStillingerFraPam(
+    esClient: RestHighLevelClient,
+    sistOppdatertPam: kjort
+) {
     var side = 0
     var updatedSince = hentNyesteOppdatert(esClient)
 
@@ -43,6 +48,7 @@ fun indekserStillingerFraPam(esClient: RestHighLevelClient) {
             side = 0
             updatedSince = stillinger.last().oppdatert
         }
+        sistOppdatertPam.kjort()
 
     } while (stillinger.size == antall)
 
