@@ -1,7 +1,8 @@
-package no.nav.fo.miaindekserer
+package no.nav.fo.miaindekserer.stillinger
 
 
 import com.google.gson.Gson
+import no.nav.fo.miaindekserer.Stilling
 import no.nav.fo.miaindekserer.helpers.*
 
 private val punctRegex = """\.""".toRegex()

@@ -1,11 +1,11 @@
-package no.nav.fo.miaindekserer.helpers
+package no.nav.fo.miaindekserer.config
 
 import indekserStattestikk
 import io.prometheus.client.exporter.MetricsServlet
 import io.prometheus.client.hotspot.DefaultExports
-import no.nav.fo.miaindekserer.hentNyesteOppdatert
-import no.nav.fo.miaindekserer.hentStillingerFraPamMedPrivate
-import no.nav.fo.miaindekserer.startPam
+import no.nav.fo.miaindekserer.stillinger.hentNyesteOppdatert
+import no.nav.fo.miaindekserer.stillinger.hentStillingerFraPamMedPrivate
+import no.nav.fo.miaindekserer.stillinger.startPam
 import org.apache.logging.log4j.LogManager
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 fun jetty(
-    sistOppdatertPam: kjort,
+    sistOppdatertPam: Kjort,
     esClient: RestHighLevelClient
 ) {
     val server = Server(8080)
@@ -56,7 +56,7 @@ class UploadeService(val esClient: RestHighLevelClient) : HttpServlet() {
 
 }
 
-data class kjort(val period: Long, val initialDilay: Long, val name: String) {
+class Kjort(private val period: Long, private val initialDilay: Long, private val name: String) {
     private val created = Date()
     private var sistKjort: Date? = null
 
@@ -65,15 +65,15 @@ data class kjort(val period: Long, val initialDilay: Long, val name: String) {
     }
 
     fun healty(multiplier: Double = 3.0): Boolean {
-        return if(sistKjort == null) {
-            created.time  > Date().time - (period * multiplier) - initialDilay - 1000
+        return if (sistKjort == null) {
+            created.time > Date().time - (period * multiplier) - initialDilay - 1000
         } else {
             (sistKjort as Date).time > Date().time - (period * multiplier) - 1000
         }
     }
 
     fun status(): String {
-        return if(sistKjort == null) {
+        return if (sistKjort == null) {
             "$name ikke kjørt enda, created: $created"
         } else {
             "$name sist skjort: $sistKjort created: $created"
@@ -81,9 +81,8 @@ data class kjort(val period: Long, val initialDilay: Long, val name: String) {
     }
 }
 
-class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
-    val logger = LogManager.getLogger()
-    val client = esClient
+class IsRedy(private val esClient: RestHighLevelClient) : HttpServlet() {
+    private val logger = LogManager.getLogger()!!
 
     var esReady = false
     var pamRedy = false
@@ -91,7 +90,7 @@ class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 
         if (!esReady) {
-            hentNyesteOppdatert(esClient = client)
+            hentNyesteOppdatert(esClient = esClient)
             esReady = true
         }
 
@@ -113,12 +112,12 @@ class IsRedy(esClient: RestHighLevelClient) : HttpServlet() {
     }
 }
 
-class IsAlive(val sistIndeksertFraPam: kjort) : HttpServlet() {
-    val logger = LogManager.getLogger()
+class IsAlive(val sistIndeksertFraPam: Kjort) : HttpServlet() {
+    private val logger = LogManager.getLogger()!!
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 
-        if(sistIndeksertFraPam.healty()) {
+        if (sistIndeksertFraPam.healty()) {
             logger.debug("healty :) " + sistIndeksertFraPam.status())
 
             resp.status = 200

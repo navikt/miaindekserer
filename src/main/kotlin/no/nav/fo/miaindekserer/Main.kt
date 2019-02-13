@@ -1,10 +1,12 @@
 package no.nav.fo.miaindekserer
 
+import no.nav.fo.miaindekserer.config.*
 import no.nav.fo.miaindekserer.helpers.*
+import no.nav.fo.miaindekserer.stillinger.indekserStillingerFraPam
+import no.nav.fo.miaindekserer.stillinger.pamUrl
 import org.apache.logging.log4j.LogManager
 
 import kotlin.concurrent.fixedRateTimer
-import java.util.*
 
 private val logger = LogManager.getLogger()
 
@@ -22,7 +24,7 @@ fun main(args: Array<String>) {
         esClient.createIndice(stillingsIndex, stillingerMapping)
     }
 
-    val sistOppdatertPam = kjort(60_000, 100, "pam indekserer")
+    val sistOppdatertPam = Kjort(60_000, 100, "pam indekserer")
     fixedRateTimer(
         name = "pamStillingOppdaterer",
         initialDelay = 100,

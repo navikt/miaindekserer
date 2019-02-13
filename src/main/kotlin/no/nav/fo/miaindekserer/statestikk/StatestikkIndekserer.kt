@@ -50,11 +50,11 @@ fun indekserStattestikk(stream: InputStream, esClient: RestHighLevelClient, alia
 
     esClient.replaceIndexForAlias(alias, index)
 
-    val sucsess =  !failurs.contains(true)
+    val sucsess = !failurs.contains(true)
 
-    if(sucsess) {
-        logger.info("indeksering vewlykket av $alias")
-    }else {
+    if (sucsess) {
+        logger.info("indeksering velykket av $alias")
+    } else {
         logger.error("indeksering feiler av $alias")
     }
 
