@@ -30,6 +30,8 @@ fun indekserStillingerFraPam(
     esClient: RestHighLevelClient,
     sistOppdatertPam: kjort
 ) {
+    slettGamleStillinger(esClient)
+
     var side = 0
     var updatedSince = hentNyesteOppdatert(esClient)
 
@@ -52,7 +54,6 @@ fun indekserStillingerFraPam(
 
     } while (stillinger.size == antall)
 
-    slettGamleStillinger(esClient)
 }
 
 fun RestHighLevelClient.indekser(stillinger: List<Stilling>) {
@@ -79,26 +80,25 @@ private fun bulkUpsertRequest(stillinger: List<Stilling>) = BulkRequest()
         })!!
 
 fun slettGamleStillinger(esClient: RestHighLevelClient) {
-    val response = esClient.deleteByQuery(
-        DeleteByQueryRequest(stillingsIndex)
-            .setQuery(
-                QueryBuilders.boolQuery()
-                    .should(
-                        QueryBuilders.boolQuery()
-                            .must(QueryBuilders.rangeQuery("gyldigTil").lte(midenattIGard()))
-                            .must(QueryBuilders.rangeQuery(oppdatert).lt(hentNyesteOppdatert(esClient)))
-                    )
-                    .should(
-                        QueryBuilders.boolQuery()
-                            .must(QueryBuilders.matchQuery("active", false))
-                            .must(QueryBuilders.rangeQuery(oppdatert).lt(hentNyesteOppdatert(esClient)))
-                    )
-                    .minimumShouldMatch(1)
-            ),
-        RequestOptions.DEFAULT
-    )
-
-    logger.info("""deletetet : ${response.deleted} stillinger""")
+        val response = esClient.deleteByQuery(
+            DeleteByQueryRequest(stillingsIndex)
+                .setQuery(
+                    QueryBuilders.boolQuery()
+                        .should(
+                            QueryBuilders.boolQuery()
+                                .must(QueryBuilders.rangeQuery("gyldigTil").lte(midenattIGard()))
+                                .must(QueryBuilders.rangeQuery(oppdatert).lt(hentNyesteOppdatert(esClient)))
+                        )
+                        .should(
+                            QueryBuilders.boolQuery()
+                                .must(QueryBuilders.matchQuery("active", false))
+                                .must(QueryBuilders.rangeQuery(oppdatert).lt(hentNyesteOppdatert(esClient)))
+                        )
+                        .minimumShouldMatch(1)
+                ),
+            RequestOptions.DEFAULT
+        )
+        logger.info("""deletetet : ${response.deleted} stillinger""")
 }
 
 fun hentNyesteOppdatert(esClient: RestHighLevelClient): String {

@@ -22,11 +22,11 @@ fun main(args: Array<String>) {
         esClient.createIndice(stillingsIndex, stillingerMapping)
     }
 
-    val sistOppdatertPam = kjort(50000, 10, "pam indekserer")
+    val sistOppdatertPam = kjort(60_000, 100, "pam indekserer")
     fixedRateTimer(
         name = "pamStillingOppdaterer",
         initialDelay = 100,
-        period = 50000
+        period = 60_000
     )
     {
         try {
