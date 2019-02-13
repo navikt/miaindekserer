@@ -5,7 +5,7 @@ import io.prometheus.client.Counter
 import io.prometheus.client.Gauge
 import no.nav.fo.miaindekserer.Stilling
 import no.nav.fo.miaindekserer.doc
-import no.nav.fo.miaindekserer.config.kjort
+import no.nav.fo.miaindekserer.config.Kjort
 import no.nav.fo.miaindekserer.helpers.midenattIGard
 import no.nav.fo.miaindekserer.oppdatert
 import no.nav.fo.miaindekserer.stillingsIndex
@@ -37,7 +37,7 @@ private val antallIndeksert = Counter.build().name("stillinger_antall_registrert
 
 fun indekserStillingerFraPam(
     esClient: RestHighLevelClient,
-    sistOppdatertPam: kjort
+    sistOppdatertPam: Kjort
 ) {
     slettGamleStillinger(esClient)
 

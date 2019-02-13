@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 fun jetty(
-    sistOppdatertPam: kjort,
+    sistOppdatertPam: Kjort,
     esClient: RestHighLevelClient
 ) {
     val server = Server(8080)
@@ -56,7 +56,7 @@ class UploadeService(val esClient: RestHighLevelClient) : HttpServlet() {
 
 }
 
-data class kjort(val period: Long, val initialDilay: Long, val name: String) {
+class Kjort(private val period: Long, private val initialDilay: Long, private val name: String) {
     private val created = Date()
     private var sistKjort: Date? = null
 
@@ -82,7 +82,7 @@ data class kjort(val period: Long, val initialDilay: Long, val name: String) {
 }
 
 class IsRedy(private val esClient: RestHighLevelClient) : HttpServlet() {
-    val logger = LogManager.getLogger()
+    private val logger = LogManager.getLogger()!!
 
     var esReady = false
     var pamRedy = false
@@ -112,8 +112,8 @@ class IsRedy(private val esClient: RestHighLevelClient) : HttpServlet() {
     }
 }
 
-class IsAlive(val sistIndeksertFraPam: kjort) : HttpServlet() {
-    val logger = LogManager.getLogger()
+class IsAlive(val sistIndeksertFraPam: Kjort) : HttpServlet() {
+    private val logger = LogManager.getLogger()!!
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 

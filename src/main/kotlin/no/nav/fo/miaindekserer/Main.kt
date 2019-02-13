@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
         esClient.createIndice(stillingsIndex, stillingerMapping)
     }
 
-    val sistOppdatertPam = kjort(60_000, 100, "pam indekserer")
+    val sistOppdatertPam = Kjort(60_000, 100, "pam indekserer")
     fixedRateTimer(
         name = "pamStillingOppdaterer",
         initialDelay = 100,
