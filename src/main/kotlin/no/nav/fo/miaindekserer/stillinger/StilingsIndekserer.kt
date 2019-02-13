@@ -31,9 +31,9 @@ private val antall = 100
 
 private val logger = LogManager.getLogger("pamIndekser")!!
 
-private val sistOppdatert = Gauge.build().name("stillinger_oppdatert_sist_pam").register()!!
-private val antallSlettet = Counter.build().name("stillinger_antall_slettet").register()!!
-private val antallIndeksert = Counter.build().name("stillinger_antall_registrert").register()!!
+private val sistOppdatert = Gauge.build().name("stillinger_oppdatert_sist_pam").help("stillinger_oppdatert_sist_pam").register()!!
+private val antallSlettet = Counter.build().name("stillinger_antall_slettet").help("stillinger_antall_slettet").register()!!
+private val antallIndeksert = Counter.build().name("stillinger_antall_registrert").help("stillinger_antall_registrert").register()!!
 
 fun indekserStillingerFraPam(
     esClient: RestHighLevelClient,
