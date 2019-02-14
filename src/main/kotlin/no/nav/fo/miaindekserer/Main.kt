@@ -15,8 +15,6 @@ fun main(args: Array<String>) {
     logger.info("esUrl = $esUri")
     logger.info("pamURL = $pamUrl")
 
-    addShutdownHook()
-
     val esClient = elasticClient()
 
 

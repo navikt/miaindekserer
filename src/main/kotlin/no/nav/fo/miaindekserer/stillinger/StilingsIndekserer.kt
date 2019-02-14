@@ -34,6 +34,7 @@ private val logger = LogManager.getLogger("pamIndekser")!!
 private val sistOppdatert = Gauge.build().name("stillinger_oppdatert_sist_pam").help("stillinger_oppdatert_sist_pam").register()!!
 private val antallSlettet = Counter.build().name("stillinger_antall_slettet").help("stillinger_antall_slettet").register()!!
 private val antallIndeksert = Counter.build().name("stillinger_antall_registrert").help("stillinger_antall_registrert").register()!!
+private val antallIFeilet = Counter.build().name("stillinger_antall_feilet_registrert").help("stillinger_antall_FEILET_registrert").register()!!
 
 fun indekserStillingerFraPam(
     esClient: RestHighLevelClient,
@@ -76,6 +77,7 @@ fun RestHighLevelClient.indekser(stillinger: List<Stilling>) {
 
         if (response.hasFailures()) {
             logger.warn("""indeksering har feil ${response.buildFailureMessage()}""")
+            antallIFeilet.inc(response.items.filter { it.isFailed }.size.toDouble())
         }
         val antall = response.items.filter { !it.isFailed }.size
         logger.info("indekserte: $antall velykket")
