@@ -102,7 +102,7 @@ class IsRedy(private val esClient: RestHighLevelClient) : HttpServlet() {
         if (pamRedy && esReady) {
             resp.status = 200
             resp.writer.println("Is Redy!")
-            logger.debug("Is Ready")
+            logger.info("Is Ready")
         } else {
             logger.warn("ikke ready pam: $pamRedy, es: $esReady")
             resp.status = 500
@@ -118,7 +118,7 @@ class IsAlive(val sistIndeksertFraPam: Kjort) : HttpServlet() {
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 
         if (sistIndeksertFraPam.healty()) {
-            logger.debug("healty :) " + sistIndeksertFraPam.status())
+            logger.info("healty :) " + sistIndeksertFraPam.status())
 
             resp.status = 200
             resp.writer.println("Healty")
