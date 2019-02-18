@@ -6,7 +6,7 @@ import no.nav.fo.miaindekserer.stillinger.indekserStillingerFraPam
 import no.nav.fo.miaindekserer.stillinger.pamUrl
 import org.apache.logging.log4j.LogManager
 
-import kotlin.concurrent.fixedRateTimer
+import kotlin.concurrent.timer
 
 private val logger = LogManager.getLogger()
 
@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
     }
 
     val sistOppdatertPam = Kjort(60_000, 100, "pam indekserer")
-    fixedRateTimer(
+    timer(
         name = "pamStillingOppdaterer",
         initialDelay = 100,
         period = 60_000
