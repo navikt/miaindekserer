@@ -1,5 +1,8 @@
 import com.google.gson.Gson
+import com.jcraft.jsch.ChannelSftp
+import com.jcraft.jsch.Session
 import no.nav.fo.miaindekserer.Statestikk
+import no.nav.fo.miaindekserer.config.sftp
 import no.nav.fo.miaindekserer.helpers.*
 import no.nav.fo.miaindekserer.statestikkMapping
 import org.apache.commons.csv.CSVFormat
@@ -11,6 +14,8 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestHighLevelClient
 import java.io.InputStream
+import java.lang.IllegalStateException
+import java.lang.RuntimeException
 import java.time.LocalDateTime
 
 private val gson = Gson()
@@ -22,17 +27,37 @@ private val csvFormat = CSVFormat
 
 private val logger = LogManager.getLogger()
 
-fun indekserStattestikk(stream: InputStream, esClient: RestHighLevelClient, alias: String): Boolean {
+fun indekser(esClient: RestHighLevelClient, session: Session) {
+    return sftp(session) { sftp ->
+        val filenames = sftp.ls(".")
+            .mapNotNull {
+                (it as ChannelSftp.LsEntry?)?.filename
+            }
+
+        val indeksAlias = filenames
+            .map { esClient.indekserStattestikk(stream = sftp.get(it), alias = it) }
+
+        esClient.
+            replaceIndexForAlias(indeksAlias)
+
+        filenames.map {
+            sftp.rm(it)
+        }
+
+    }
+}
+
+fun RestHighLevelClient.indekserStattestikk(stream: InputStream, alias: String): IndexAlias {
     val bufferedReader = stream.bufferedReader()
 
     val csvParser = CSVParser(bufferedReader, csvFormat)
     val index = alias + LocalDateTime.now().toString().replace(":", "_").toLowerCase()
-    esClient.createIndice(
+    this.createIndice(
         name = index,
         jsonMapping = statestikkMapping
     )
 
-    val failurs = csvParser
+    val antall = csvParser
         .chunked(100) { csvList ->
             val requests = csvList
                 .asSequence()
@@ -45,42 +70,66 @@ fun indekserStattestikk(stream: InputStream, esClient: RestHighLevelClient, alia
                     )
                 }.toList()
 
-            esClient.bulk(requests = requests)?.hasFailures() ?: true
-        }
 
-    esClient.replaceIndexForAlias(alias, index)
+            val response = this.bulk(requests = requests)
+            if(response?.hasFailures() == true) {
+                logger.error("indeksering fra datavarehus feilet")
+                logger.error(response.buildFailureMessage())
 
-    val sucsess = !failurs.contains(true)
+                throw IllegalStateException("indeksereing fra datavarehus feilet")
+            }
+            requests.size
+        }.sum()
 
-    if (sucsess) {
-        logger.info("indeksering velykket av $alias")
-    } else {
-        logger.error("indeksering feiler av $alias")
-    }
+    logger.info("indeksering av alias: $alias som indeks $index fra datavarehus velykket")
+    logger.info("indeks: $index indeksert med $antall inslag")
 
-    return sucsess
+    return IndexAlias(
+        index= index,
+        alias = alias
+    )
 }
 
-private fun RestHighLevelClient.replaceIndexForAlias(alias: String, nyIndex: String) {
-    val removeOldIndexes = IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE)
-        .alias(alias)
-        .index("*")
+fun RestHighLevelClient.replaceIndexForAlias(indeksAliastList: List<IndexAlias>) {
+    val request = indeksAliastList.fold(IndicesAliasesRequest()) { req, indexAlias ->
 
-    val addNewIndex = IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD)
-        .alias(alias)
-        .index(nyIndex)
+        req.addAliasAction(
+            IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE)
+                .alias(indexAlias.alias)
+                .index("*")
+        )
 
-    val request = IndicesAliasesRequest()
-        .addAliasAction(removeOldIndexes)
-        .addAliasAction(addNewIndex)
+        req.addAliasAction(
+            IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD)
+                .alias(indexAlias.alias)
+                .index(indexAlias.index)
+        )
 
-    this
+    }
+
+    val updateAliases = this
         .indices()
         .updateAliases(request, RequestOptions.DEFAULT)
 
-    this
-        .indices()
-        .delete(DeleteIndexRequest("${alias}*,-$nyIndex"), RequestOptions.DEFAULT)
+    if(!updateAliases.isAcknowledged) {
+        logger.error("noe feil med oppdatering av alias")
+        logger.warn(updateAliases.toString())
+        throw RuntimeException("feil ved endring av alias")
+    }
+
+    indeksAliastList.forEach{
+        val response = this
+            .indices()
+            .delete(DeleteIndexRequest("${it.alias}*,-${it.index}"), RequestOptions.DEFAULT)
+
+        if(!response.isAcknowledged){
+            logger.error("noe feil med sletting av gamle indekser")
+            logger.warn(updateAliases.toString())
+            throw RuntimeException("feil ved sletting av gamle indekser")
+        }
+    }
+
+
 }
 
 
@@ -98,3 +147,7 @@ private fun getData(it: CSVRecord): Statestikk {
     )
 }
 
+
+
+
+data class IndexAlias(val index: String, val alias: String)
