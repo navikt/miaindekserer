@@ -11,6 +11,7 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
 import org.elasticsearch.client.RestHighLevelClient
+import replaceIndexForAlias
 import java.util.*
 import javax.servlet.MultipartConfigElement
 import javax.servlet.http.HttpServlet
@@ -48,7 +49,9 @@ class UploadeService(val esClient: RestHighLevelClient) : HttpServlet() {
         val alias = req.queryString.split("=")[1]
         logger.info("uploding file to alias $alias")
         val part = req.getPart("file")
-        indekserStattestikk(stream = part.inputStream, esClient = esClient, alias = alias)
+
+        val indeksereAliase= esClient.indekserStattestikk(stream = part.inputStream, alias = alias)
+        esClient.replaceIndexForAlias(listOf(indeksereAliase))
 
         resp.status = 200
         resp.writer.println("$alias suksefult oppdatert")
@@ -102,7 +105,6 @@ class IsRedy(private val esClient: RestHighLevelClient) : HttpServlet() {
         if (pamRedy && esReady) {
             resp.status = 200
             resp.writer.println("Is Redy!")
-            logger.info("Is Ready")
         } else {
             logger.warn("ikke ready pam: $pamRedy, es: $esReady")
             resp.status = 500
@@ -118,8 +120,6 @@ class IsAlive(val sistIndeksertFraPam: Kjort) : HttpServlet() {
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse) {
 
         if (sistIndeksertFraPam.healty()) {
-            logger.info("healty :) " + sistIndeksertFraPam.status())
-
             resp.status = 200
             resp.writer.println("Healty")
             resp.writer.println(sistIndeksertFraPam.status())
