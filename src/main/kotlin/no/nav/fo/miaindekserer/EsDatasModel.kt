@@ -51,7 +51,7 @@ data class Statestikk(
 val statestikkMapping =
     """
         {
-          "_doc: {
+          "_doc": {
             "properties": {
               "periode"       : { "type": "keyword" },
               "fylkesnummer"  : { "type": "keyword" },
