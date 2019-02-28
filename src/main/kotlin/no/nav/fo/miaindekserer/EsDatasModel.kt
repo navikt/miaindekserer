@@ -19,23 +19,24 @@ data class Stilling(
 )
 
 val stillingerMapping =
-    """{
-            "_doc": {
-              "properties": {
-                "id": { "type": "text" },
-                "active": { "type": "boolean" },
-                "public": { "type": "boolean" },
-                "antall": { "type": "short" },
-                "styrkKode": { "type": "keyword" },
-                "hovedkategori": { "type": "keyword" },
-                "underkattegori": { "type": "keyword" },
-                "komuneNumer": { "type": "keyword" },
-                "fylkesnr": { "type": "keyword" },
-                "gyldigTil": { "type": "date" },
-                "oppdatert": { "type": "date" }
-              }
+    """
+        {
+          "_doc": {
+            "properties": {
+              "id": { "type": "text" },
+              "active": { "type": "boolean" },
+              "public": { "type": "boolean" },
+              "antall": { "type": "short" },
+              "styrkKode": { "type": "keyword" },
+              "hovedkategori": { "type": "keyword" },
+              "underkattegori": { "type": "keyword" },
+              "komuneNumer": { "type": "keyword" },
+              "fylkesnr": { "type": "keyword" },
+              "gyldigTil": { "type": "date" },
+              "oppdatert": { "type": "date" }
             }
-           }""".trimIndent()
+          }
+        }""".trimIndent()
 
 data class Statestikk(
     val periode: String,
@@ -50,14 +51,16 @@ data class Statestikk(
 val statestikkMapping =
     """
         {
-          "properties": {
-            "periode"       : { "type": "keyword" },
-            "fylkesnummer"  : { "type": "keyword" },
-            "komuneNumer"   : { "type": "keyword" },
-            "antall"        : { "type": "integer" },
-            "hovedkategori" : { "type": "keyword" },
-            "underkattegori": { "type": "keyword" },
-            "styrkKode"     : { "type": "keyword" }
+          "_doc: {
+            "properties": {
+              "periode"       : { "type": "keyword" },
+              "fylkesnummer"  : { "type": "keyword" },
+              "komuneNumer"   : { "type": "keyword" },
+              "antall"        : { "type": "integer" },
+              "hovedkategori" : { "type": "keyword" },
+              "underkattegori": { "type": "keyword" },
+              "styrkKode"     : { "type": "keyword" }
+            }
           }
         }
     """.trimIndent()
