@@ -17,7 +17,7 @@ healthcheck:
 
 resources:
   limits:
-    cpu: 3
+    cpu: 10
     memory: 768Mi
   requests:
     memory: 256Mi
