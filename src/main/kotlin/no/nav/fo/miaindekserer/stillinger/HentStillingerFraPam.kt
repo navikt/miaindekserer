@@ -29,7 +29,7 @@ fun hentStillingerFraPamMedPrivate(side: Int, updatedSince: String, perSide: Int
                 ?.mapNotNull { category -> category?.code }
                 ?.map { s -> s.split(punctRegex).first() } ?: emptyList()
 
-            val komuineNr = it.location?.municipalCode ?: ingenKomune
+            val komuineNr = it.locationList?.first()?.municipalCode ?: ingenKomune
 
             Stilling(
                 id = it.uuid,
@@ -56,7 +56,7 @@ data class JsonStilling(
     val updated: String,
     val categoryList: MutableList<Category?>?,
     val properties: Properties?,
-    val location: Location?
+    val locationList: MutableList<Location?>?
 )
 
 data class Category(val code: String?)
