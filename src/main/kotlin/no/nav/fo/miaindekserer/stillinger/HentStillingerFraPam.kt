@@ -29,6 +29,7 @@ fun hentStillingerFraPamMedPrivate(side: Int, updatedSince: String, perSide: Int
                 ?.mapNotNull { category -> category?.code }
                 ?.map { s -> s.split(punctRegex).first() } ?: emptyList()
 
+
             val lokationlist = it.locationList
             val location = lokationlist?.firstOrNull()
             val komuineNr = location?.municipalCode ?: ingenKomune
